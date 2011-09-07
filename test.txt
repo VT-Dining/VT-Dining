@@ -1,7 +1,0 @@
-<<<<<<< HEAD
-Soup. This is a test.
-close.
-=======
-Soup. Teststasdlkjsfadjlkfdskjlsfdjl 
-close.
->>>>>>> 6ac6ec4b4f7b96226d7dc52f0853db33e1970e0a
