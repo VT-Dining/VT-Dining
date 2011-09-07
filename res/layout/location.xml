@@ -16,12 +16,22 @@
 	    android:layout_alignParentLeft="true"
 	 />
 	 <TextView 
+	   android:text="Time Ranges"
 	   android:layout_width="wrap_content"
 	   android:layout_height="wrap_content"
 	   android:textColor="#FF000000"
 	   android:paddingLeft="10dp"
 	   android:paddingBottom="15dp"
 	   android:layout_below="@id/locationName"
-	 />
+	   android:id="@+id/textView1"/>
+	   <ImageView 
+	   android:layout_alignParentRight="true"
+	   android:layout_centerVertical="true"
+	   android:paddingRight="15dp"
+	   android:src="@drawable/red"
+	   android:layout_width="wrap_content"
+	   android:layout_height="wrap_content"
+	   />
+	 
 
 </RelativeLayout>
