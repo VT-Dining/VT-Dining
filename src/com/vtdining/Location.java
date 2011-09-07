@@ -8,7 +8,7 @@ public class Location implements Serializable {
     private String location;
     private Vector<String> hours = new Vector<String>();
     private Vector<Range> ranges = new Vector<Range>();
-
+    private Vector <String> reducedHours=new Vector<String>();//Just the times.
     public Location(String location, Vector<String> hours) {
 	this.hours = hours;
 	this.location = location;
@@ -16,6 +16,7 @@ public class Location implements Serializable {
 	    int index1 = s.indexOf(":") - 2;
 	    int index2 = s.indexOf("-");
 	    int index3 = s.lastIndexOf(":") + 6;
+	    reducedHours.add(s.substring(index1));
 	    String time1 = s.substring(index1, index2);
 	    String time2 = s.substring(index2 + 1, index3);
 	    time1 = time1.replace(" ", "");

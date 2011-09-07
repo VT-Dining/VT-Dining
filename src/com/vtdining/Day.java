@@ -9,7 +9,10 @@ public class Day{
     private int day,month,year;
     private Vector<Location> locations=new Vector<Location>();
     public Day(int day, int month, int year) throws Exception{
-	    String data = getData(day,month,year);
+	load(day,month,year);
+    }
+    public void load(int d, int m, int y) throws Exception {
+	 String data = getData(d,m,y);
 	    this.day=getDay(data);
 	    this.month=getMonth(data);
 	    this.year=getYear(data);
