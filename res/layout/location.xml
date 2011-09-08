@@ -24,6 +24,7 @@
 	   android:textColor="#FF000000"
 	   android:paddingLeft="10dp"
 	   android:paddingBottom="15dp"
+	   android:paddingTop="5dp"
 	   android:layout_below="@id/locationName"
 	   android:id="@+id/textView1"/>
 	   <ImageView 

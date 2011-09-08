@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="fill_parent" android:gravity="bottom"
-	android:background="#FFFFFFFF">
-	<LinearLayout android:orientation="horizontal"
+    android:orientation="vertical" android:layout_width="fill_parent"
+    android:layout_height="fill_parent" android:gravity="bottom"
+    android:background="#FFFFFFFF">
+    <LinearLayout android:orientation="horizontal"
         android:layout_width="fill_parent" android:layout_height="wrap_content"
         android:gravity="center_horizontal" android:layout_alignParentBottom="true"
         android:id="@+id/buttons">
@@ -11,23 +11,27 @@
             android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:onClick="decDay" />
         <ImageButton android:id="@+id/calendar" android:src="@drawable/calendar"
-            android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            android:layout_width="wrap_content" android:layout_height="wrap_content" 
+            android:onClick="pickDate"/>
         <ImageButton android:id="@+id/next" android:src="@drawable/forward"
             android:layout_width="wrap_content" android:layout_height="wrap_content" 
             android:onClick="incDay"/>
+            <ImageButton android:src="@drawable/refresh"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" 
+            android:onClick="refresh"/>
     </LinearLayout>
     
-	<TextView android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:text="Loading..."
-		android:gravity="center"
-		android:textSize="30dp" android:textColor="#FF000000" android:id="@+id/date" />
-	<ScrollView android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:orientation="vertical"
-		android:layout_below="@id/date" android:layout_above="@id/buttons" android:id="@+id/locationScroller">
-		<LinearLayout android:orientation="vertical" android:id="@+id/locations"
-			android:layout_width="fill_parent" android:layout_height="wrap_content">
-		</LinearLayout>
-	</ScrollView>
+    <TextView android:layout_width="fill_parent"
+        android:layout_height="wrap_content" android:text="Loading..."
+        android:gravity="center"
+        android:textSize="30dp" android:textColor="#FF000000" android:id="@+id/date" />
+    <ScrollView android:layout_width="fill_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:layout_below="@id/date" android:layout_above="@id/buttons" android:id="@+id/locationScroller">
+        <LinearLayout android:orientation="vertical" android:id="@+id/locations"
+            android:layout_width="fill_parent" android:layout_height="wrap_content">
+        </LinearLayout>
+    </ScrollView>
 
-	
+
 </RelativeLayout>

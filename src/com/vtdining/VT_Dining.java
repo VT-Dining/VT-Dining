@@ -1,20 +1,26 @@
 package com.vtdining;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.DateFormatSymbols;
+import java.util.Calendar;
 
 public class VT_Dining extends Activity {
     /** Called when the activity is first created. */
@@ -27,27 +33,100 @@ public class VT_Dining extends Activity {
     public void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.main);
-	date = new Days();
+	loadCachedDays();
+	date.setNow();
 	dateDisplay = (TextView) findViewById(R.id.date);
 	locations = (LinearLayout) findViewById(R.id.locations);
 	h = new Handler() {
 	    public void handleMessage(Message m) {
-		if (m.what == 1)
-		    printEx((Exception) m.obj);
-		else
+		if (m.what != 1)
 		    setUp();
 	    }
 	};
 	load();
     }
 
-    public void tText(String text) {
-	Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    public void refresh(View v) {
+	date.refresh();
+	load();
+    }
+
+    public void pickDate(View v) {
+	showDialog(0);
+
+    }
+
+    protected Dialog onCreateDialog(int id) {
+	return new DatePickerDialog(this,
+		new DatePickerDialog.OnDateSetListener() {
+		    public void onDateSet(DatePicker d, int year, int month,
+			    int day) {
+			date.date.set(Calendar.YEAR, year);
+			date.date.set(Calendar.MONTH, month);
+			date.date.set(Calendar.DATE, day);
+			load();
+		    }
+		}, date.date.get(Calendar.YEAR), date.date.get(Calendar.MONTH),
+		date.date.get(Calendar.DATE));
+
+    }
+
+    public void loadCachedDays() {
+	ObjectInputStream in = null;
+	try {
+	    in = new ObjectInputStream(openFileInput("cachedDays"));
+	    date = (Days) in.readObject();
+	    in.close();
+	} catch (Exception e) {
+	    if (in != null)
+		try {
+		    in.close();
+		} catch (IOException e1) {
+		}
+	    loadPreloadedDays();
+	}
+    }
+
+    public void loadPreloadedDays() {
+	ObjectInputStream in = null;
+	try {
+	    in = new ObjectInputStream(getResources().openRawResource(
+		    R.raw.data));
+	    date = (Days) in.readObject();
+	    in.close();
+	} catch (Exception e) {
+	    if (in != null)
+		try {
+		    in.close();
+		} catch (IOException e1) {
+		}
+	    loadPreloadedDays();
+	}
+    }
+
+    public void onStop() {
+	ObjectOutputStream out = null;
+	try {
+	    out = new ObjectOutputStream(openFileOutput("cachedDays",
+		    MODE_PRIVATE));
+	    out.writeObject(date);
+	    out.flush();
+	    out.close();
+	} catch (Exception e) {
+	    try {
+		if (out != null)
+		    out.close();
+	    } catch (IOException e1) {
+	    }
+	}
+	super.onStop();
     }
 
     public void load() {
-	if(date.requiresLoading())
-	dateDisplay.setText("Loading...");
+	if (date.requiresLoading()) {
+	    dateDisplay.setText("Loading...");
+	    locations.removeAllViews();
+	}
 	new Thread() {
 	    public void run() {
 		Looper.prepare();
@@ -72,28 +151,33 @@ public class VT_Dining extends Activity {
 	    for (Location l : date.getLocations()) {
 		ViewGroup location = (ViewGroup) getLayoutInflater().inflate(
 			R.layout.location, null);
-		((TextView) location.getChildAt(0)).setText(l.getName());
+		String times = l.getTimes();
+		String name = l.getName();
+		if (times.contains("no operation hours")) {
+		    times = "";
+		    name = "No Locations Open Today";
+		}
+		((TextView) location.getChildAt(0)).setText(name);
 		TextView time = (TextView) location.getChildAt(1);
-		time.setText(l.getTimes());
+		time.setText(times);
 		time.setHeight(0);
 		((ImageView) location.getChildAt(2))
 			.setImageResource(getColorID(l));
 		locations.addView(location);
 	    }
 	} catch (Exception e) {
-	    printEx(e);
 	}
 
     }
 
     private String getMonth(int month) {
-	return ""+new DateFormatSymbols().getMonths()[month-1];
+	return "" + new DateFormatSymbols().getMonths()[month - 1];
     }
 
     public void expandItem(View v) {
 	TextView time = (TextView) ((ViewGroup) v).getChildAt(1);
 	if (time.getHeight() == 0)
-	    time.setHeight(time.getLineHeight() * time.getLineCount() + 5);
+	    time.setHeight(time.getLineHeight() * time.getLineCount() + 15);
 	else
 	    time.setHeight(0);
     }
@@ -121,15 +205,4 @@ public class VT_Dining extends Activity {
 		return R.drawable.red;
 	}
     }
-
-    public void printEx(Exception e) {
-	final TextView t = new TextView(this);
-	e.printStackTrace(new PrintStream(new OutputStream() {
-	    public void write(int i) throws IOException {
-		t.append("" + (char) i);
-	    }
-	}));
-	locations.addView(t);
-    }
-
 }

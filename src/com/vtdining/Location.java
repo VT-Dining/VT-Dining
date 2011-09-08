@@ -14,6 +14,11 @@ public class Location implements Serializable {
 	this.location = location;
 	for (String s : hours) {
 	    int index1 = s.indexOf(":") - 2;
+	    if(index1<0) {
+		this.location="No Locations Open Today";
+		hours.set(0, "");
+		break;
+	    }
 	    int index2 = s.indexOf("-");
 	    int index3 = s.lastIndexOf(":") + 6;
 	    reducedHours.add(s.substring(index1));
@@ -27,7 +32,10 @@ public class Location implements Serializable {
 	    String minute2 = time2.substring(time2.indexOf(":") + 1);
 	    minute1 = minute1.substring(0, 2);
 	    minute2 = minute2.substring(0, 2);
-	    int h1 = Integer.parseInt(hour1) * 60
+	    int h=Integer.parseInt(hour1);
+	    if(h==12)
+		h=0;
+	    int h1 =h  * 60
 		    + (time1.contains("pm") ? 12 * 60 : 0);
 	    int h2 = Integer.parseInt(hour2) * 60
 		    + (time2.contains("pm") ? 12 * 60 : 0);
@@ -39,7 +47,6 @@ public class Location implements Serializable {
 	    int t2 = h2 + Integer.parseInt(minute2);
 	    if (t2 < t1)
 		t2 += 24 * 60;
-	    System.out.println(location + "   " + t1 + " - " + t2);
 	    ranges.add(new Range(t1, t2));
 	}
     }

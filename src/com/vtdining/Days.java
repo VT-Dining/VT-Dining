@@ -16,15 +16,23 @@ import java.util.Vector;
 public class Days implements Serializable {
     private static final long serialVersionUID = 1L;
     public HashMap<String, Day> days = new HashMap<String, Day>();
-    private Calendar date;
-    int t = 0;
+    public Calendar date;
 
     public Days() {
-	date = Calendar.getInstance();
+
+    }
+    public void setNow() {
+	Calendar date2 = Calendar.getInstance();
+	date.set(Calendar.YEAR, date2.get(Calendar.YEAR));
+	date.set(Calendar.DATE, date2.get(Calendar.DATE));
+	date.set(Calendar.MONTH, date2.get(Calendar.MONTH));
     }
 
     public Day getDay() {
 	return days.get(date.toString());
+    }
+    public void refresh() {
+	days.remove(date.toString());
     }
 
     public Vector<Location> getLocations() {
@@ -36,13 +44,11 @@ public class Days implements Serializable {
     }
 
     public void incDay() {
-	Calendar date2 = date;
-	date2.roll(Calendar.DATE, true);
-	date = date2;
+	date.add(Calendar.DAY_OF_YEAR, 1);
     }
 
     public void decDay() {
-	date.roll(Calendar.DATE, false);
+	date.add(Calendar.DAY_OF_YEAR,-1);
     }
 
     public boolean hurry(Location l) {
@@ -54,7 +60,10 @@ public class Days implements Serializable {
     }
 
     public int getTime() {
-	int t = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) * 60;
+	int t = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+	if(t==0)
+	    t=24;
+	t*= 60;
 	t += Calendar.getInstance().get(Calendar.MINUTE);
 	return t;
     }
@@ -69,19 +78,6 @@ public class Days implements Serializable {
 	if (days.size()==0||!days.containsKey(date.toString()))
 	    days.put(date.toString(), new Day(date.get(Calendar.DATE), date
 		    .get(Calendar.MONTH) + 1, date.get(Calendar.YEAR)));
-	else {
-	    new Thread() {
-		public void run() {
-		    try {
-			days.put(date.toString(), new Day(date.get(Calendar.DATE),
-			    date.get(Calendar.MONTH) + 1, date
-				    .get(Calendar.YEAR)));
-		    } catch (Exception e) {
-		    }
-		}
-	    }.start();
-	}
-
     }
 
     public boolean requiresLoading() {
