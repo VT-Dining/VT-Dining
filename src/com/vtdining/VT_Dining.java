@@ -18,6 +18,13 @@ import java.io.ObjectOutputStream;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 
+// -------------------------------------------------------------------------
+/**
+ *  VT Dining main activity
+ *
+ *  @author John
+ *  @version September 8, 2011
+ */
 public class VT_Dining extends Activity {
     /** Called when the activity is first created. */
     private Days date;
@@ -43,11 +50,20 @@ public class VT_Dining extends Activity {
 	refresh(locations);
     }
 
+    // ----------------------------------------------------------
+    /**
+     * Marks that the current date needs a refresh, then load()s
+     * @param v
+     */
     public void refresh(View v) {
 	date.refresh();
 	load();
     }
 
+    /**
+     * Shows the date picker dialog
+     * @param v unused, can be null
+     */
     public void pickDate(View v) {
 	showDialog(0);
 
@@ -69,6 +85,9 @@ public class VT_Dining extends Activity {
 
     }
 
+    /**
+     * Loads cached data if available, otherwise creates new database.
+     */
     public void loadCachedDays() {
 	ObjectInputStream in = null;
 	try {
@@ -80,11 +99,14 @@ public class VT_Dining extends Activity {
 		try {
 		    in.close();
 		} catch (IOException e1) {
+		    //suppress
 		}
 		date=new Days();
 	}
     }
-
+    /**
+     * Writes database.
+     */
     public void onStop() {
 	ObjectOutputStream out = null;
 	try {
@@ -98,13 +120,19 @@ public class VT_Dining extends Activity {
 		if (out != null)
 		    out.close();
 	    } catch (IOException e1) {
+	        //suppress
 	    }
 	}
 	super.onStop();
     }
 
+    /**
+     * Loads data in new thread, then calls helper method
+     * which calls setup from activity thread.
+     */
     public void load() {
 	if (date.requiresLoading()) {
+	    locations.removeAllViews();
 	    dateDisplay.setText("Loading...");
 	}
 	new Thread() {
@@ -122,6 +150,9 @@ public class VT_Dining extends Activity {
 	}.start();
     }
 
+    /**
+     * Builds display based on loaded data.
+     */
     public void setUp() {
 	try {
 	    locations.removeAllViews();
@@ -145,6 +176,7 @@ public class VT_Dining extends Activity {
 		locations.addView(location);
 	    }
 	} catch (Exception e) {
+	    //suppress
 	}
 
     }
@@ -152,7 +184,11 @@ public class VT_Dining extends Activity {
     private String getMonth(int month) {
 	return "" + new DateFormatSymbols().getMonths()[month - 1];
     }
-
+    /**
+     * Expands passed view.
+     *
+     * @param v View to be expanded
+     */
     public void expandItem(View v) {
 	TextView time = (TextView) ((ViewGroup) v).getChildAt(1);
 	if (time.getHeight() == 0)
@@ -160,12 +196,18 @@ public class VT_Dining extends Activity {
 	else
 	    time.setHeight(0);
     }
-
+    /**
+     * Increments the date, loads data for that date
+     * @param v unused, can be null
+     */
     public void incDay(View v) {
 	date.incDay();
 	load();
     }
-
+    /**
+     * Decrements the date, loads data for that date
+     * @param v unused, can be null
+     */
     public void decDay(View v) {
 	date.decDay();
 	load();
