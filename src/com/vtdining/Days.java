@@ -19,7 +19,7 @@ public class Days implements Serializable {
     public Calendar date;
 
     public Days() {
-    	date=new Days();
+	date=Calendar.getInstance();
     }
     public void setNow() {
 	Calendar date2 = Calendar.getInstance();

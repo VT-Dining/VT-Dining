@@ -5,7 +5,6 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +12,9 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 
@@ -39,11 +35,12 @@ public class VT_Dining extends Activity {
 	locations = (LinearLayout) findViewById(R.id.locations);
 	h = new Handler() {
 	    public void handleMessage(Message m) {
-		if (m.what != 1)
 		    setUp();
 	    }
 	};
+	date.refresh();
 	load();
+	refresh(locations);
     }
 
     public void refresh(View v) {
@@ -64,7 +61,8 @@ public class VT_Dining extends Activity {
 			date.date.set(Calendar.YEAR, year);
 			date.date.set(Calendar.MONTH, month);
 			date.date.set(Calendar.DATE, day);
-			load();
+			date.decDay();
+			incDay(locations);
 		    }
 		}, date.date.get(Calendar.YEAR), date.date.get(Calendar.MONTH),
 		date.date.get(Calendar.DATE));
@@ -83,24 +81,7 @@ public class VT_Dining extends Activity {
 		    in.close();
 		} catch (IOException e1) {
 		}
-	    loadPreloadedDays();
-	}
-    }
-
-    public void loadPreloadedDays() {
-	ObjectInputStream in = null;
-	try {
-	    in = new ObjectInputStream(getResources().openRawResource(
-		    R.raw.data));
-	    date = (Days) in.readObject();
-	    in.close();
-	} catch (Exception e) {
-	    if (in != null)
-		try {
-		    in.close();
-		} catch (IOException e1) {
-		}
-	    loadPreloadedDays();
+		date=new Days();
 	}
     }
 
@@ -125,11 +106,9 @@ public class VT_Dining extends Activity {
     public void load() {
 	if (date.requiresLoading()) {
 	    dateDisplay.setText("Loading...");
-	    locations.removeAllViews();
 	}
 	new Thread() {
 	    public void run() {
-		Looper.prepare();
 		try {
 		    date.load();
 		    h.sendEmptyMessage(0);
