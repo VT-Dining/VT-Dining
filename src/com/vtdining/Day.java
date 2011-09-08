@@ -1,12 +1,16 @@
 package com.vtdining;
+import java.io.Serializable;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Vector;
 
-public class Day{
+public class Day implements Serializable{
+    private static final long serialVersionUID = 1L;
     private int day,month,year;
+    public int lastLoad=0;
     private Vector<Location> locations=new Vector<Location>();
     public Day(int day, int month, int year) throws Exception{
 	load(day,month,year);

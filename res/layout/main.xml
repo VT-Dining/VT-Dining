@@ -8,15 +8,18 @@
         android:gravity="center_horizontal" android:layout_alignParentBottom="true"
         android:id="@+id/buttons">
         <ImageButton android:id="@+id/back" android:src="@drawable/back"
-            android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:onClick="decDay" />
         <ImageButton android:id="@+id/calendar" android:src="@drawable/calendar"
             android:layout_width="wrap_content" android:layout_height="wrap_content" />
         <ImageButton android:id="@+id/next" android:src="@drawable/forward"
-            android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            android:layout_width="wrap_content" android:layout_height="wrap_content" 
+            android:onClick="incDay"/>
     </LinearLayout>
     
 	<TextView android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:text="Current Date"
+		android:layout_height="wrap_content" android:text="Loading..."
+		android:gravity="center"
 		android:textSize="30dp" android:textColor="#FF000000" android:id="@+id/date" />
 	<ScrollView android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:orientation="vertical"

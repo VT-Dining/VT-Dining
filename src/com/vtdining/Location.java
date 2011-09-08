@@ -68,7 +68,7 @@ public class Location implements Serializable {
 
     public boolean hurry(int t, int thresh) {
 	for (Range r : ranges)
-	    if (r.timeStillIn(t) < thresh)
+	    if (r.t2-t < thresh && r.within(t))
 		return true;
 	return false;
     }
@@ -78,5 +78,14 @@ public class Location implements Serializable {
 	for (String s : hours)
 	    open += "\n    " + s;
 	return location + open;
+    }
+
+    public boolean openSoon(int t, int thresh) {
+	if(open(t))
+	    return false;
+	for (Range r : ranges)
+	    if (Math.abs(t-r.t1) < thresh)
+		return true;
+	return false;
     }
 }
