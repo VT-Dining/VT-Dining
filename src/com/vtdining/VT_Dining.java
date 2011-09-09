@@ -83,7 +83,9 @@ public class VT_Dining extends Activity {
 	showDialog(0);
 
     }
-
+    /**
+     * Refresh the GUI and startup a refresh thread
+     */
     public void onResume() {
 	setUp();
 	running=true;
@@ -100,11 +102,16 @@ public class VT_Dining extends Activity {
 	}.start();
 	super.onResume();
     }
+    /**
+     * Kill the update thread
+     */
     public void onPause() {
 	running=false; //don't run thread in background.
 	super.onPause();
     }
-
+    /**
+     * Open up a date picker
+     */
     protected Dialog onCreateDialog(int id) {
 	return new DatePickerDialog(this,
 		new DatePickerDialog.OnDateSetListener() {
@@ -257,7 +264,9 @@ public class VT_Dining extends Activity {
 	date.decDay();
 	load();
     }
-
+    /**
+     * Return resource ID based on the state of the location.
+     */
     private int getColorID(Location l) {
 	if (date.open(l)) {
 	    if (date.hurry(l))
