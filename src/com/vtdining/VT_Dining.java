@@ -20,10 +20,10 @@ import java.util.Calendar;
 
 // -------------------------------------------------------------------------
 /**
- *  VT Dining main activity
+ * VT Dining main activity
  *
- *  @author John
- *  @version September 8, 2011
+ * @author John
+ * @version September 8, 2011
  */
 public class VT_Dining extends Activity {
     /** Called when the activity is first created. */
@@ -31,6 +31,7 @@ public class VT_Dining extends Activity {
     private LinearLayout locations;
     private TextView dateDisplay;
     private Handler h;
+    private static boolean running=true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,17 +43,29 @@ public class VT_Dining extends Activity {
 	locations = (LinearLayout) findViewById(R.id.locations);
 	h = new Handler() {
 	    public void handleMessage(Message m) {
-		    setUp();
+		setUp();
 	    }
 	};
 	date.refresh();
 	load();
 	refresh(locations);
+	new Thread() { // refresh list every minute.
+	    public void run() {
+		while (running) {
+		    try {
+			Thread.sleep(60000);
+		    } catch (Exception e) {
+		    }
+		    h.sendEmptyMessage(0);
+		}
+	    }
+	}.start();
     }
 
     // ----------------------------------------------------------
     /**
      * Marks that the current date needs a refresh, then load()s
+     *
      * @param v
      */
     public void refresh(View v) {
@@ -62,11 +75,34 @@ public class VT_Dining extends Activity {
 
     /**
      * Shows the date picker dialog
-     * @param v unused, can be null
+     *
+     * @param v
+     *            unused, can be null
      */
     public void pickDate(View v) {
 	showDialog(0);
 
+    }
+
+    public void onResume() {
+	setUp();
+	running=true;
+	new Thread() { // refresh list every minute.
+	    public void run() {
+		while (running) {
+		    try {
+			Thread.sleep(60000);
+		    } catch (Exception e) {
+		    }
+		    h.sendEmptyMessage(0);
+		}
+	    }
+	}.start();
+	super.onResume();
+    }
+    public void onPause() {
+	running=false; //don't run thread in background.
+	super.onPause();
     }
 
     protected Dialog onCreateDialog(int id) {
@@ -99,11 +135,12 @@ public class VT_Dining extends Activity {
 		try {
 		    in.close();
 		} catch (IOException e1) {
-		    //suppress
+		    // suppress
 		}
-		date=new Days();
+	    date = new Days();
 	}
     }
+
     /**
      * Writes database.
      */
@@ -120,15 +157,15 @@ public class VT_Dining extends Activity {
 		if (out != null)
 		    out.close();
 	    } catch (IOException e1) {
-	        //suppress
+		// suppress
 	    }
 	}
 	super.onStop();
     }
 
     /**
-     * Loads data in new thread, then calls helper method
-     * which calls setup from activity thread.
+     * Loads data in new thread, then calls helper method which calls setup from
+     * activity thread.
      */
     public void load() {
 	if (date.requiresLoading()) {
@@ -176,7 +213,7 @@ public class VT_Dining extends Activity {
 		locations.addView(location);
 	    }
 	} catch (Exception e) {
-	    //suppress
+	    // suppress
 	}
 
     }
@@ -184,10 +221,12 @@ public class VT_Dining extends Activity {
     private String getMonth(int month) {
 	return "" + new DateFormatSymbols().getMonths()[month - 1];
     }
+
     /**
      * Expands passed view.
      *
-     * @param v View to be expanded
+     * @param v
+     *            View to be expanded
      */
     public void expandItem(View v) {
 	TextView time = (TextView) ((ViewGroup) v).getChildAt(1);
@@ -196,17 +235,23 @@ public class VT_Dining extends Activity {
 	else
 	    time.setHeight(0);
     }
+
     /**
      * Increments the date, loads data for that date
-     * @param v unused, can be null
+     *
+     * @param v
+     *            unused, can be null
      */
     public void incDay(View v) {
 	date.incDay();
 	load();
     }
+
     /**
      * Decrements the date, loads data for that date
-     * @param v unused, can be null
+     *
+     * @param v
+     *            unused, can be null
      */
     public void decDay(View v) {
 	date.decDay();
