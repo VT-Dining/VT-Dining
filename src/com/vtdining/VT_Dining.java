@@ -17,6 +17,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
+import java.util.Observable;
+import java.util.Observer;
 
 // -------------------------------------------------------------------------
 /**
@@ -27,39 +29,29 @@ import java.util.Calendar;
  */
 public class VT_Dining extends Activity {
     /** Called when the activity is first created. */
+    private Handler h;
     private Days date;
     private LinearLayout locations;
     private TextView dateDisplay;
-    private Handler h;
-    private static boolean running=true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.main);
 	loadCachedDays();
-	date.setNow();
-	dateDisplay = (TextView) findViewById(R.id.date);
-	locations = (LinearLayout) findViewById(R.id.locations);
 	h = new Handler() {
 	    public void handleMessage(Message m) {
 		setUp();
 	    }
 	};
-	date.refresh();
-	load();
+
+	date.setNow();
+	dateDisplay = (TextView) findViewById(R.id.date);
+	locations = (LinearLayout) findViewById(R.id.locations);
+	date.startUp();
+	date.load();
+	date.addObserver(new DaysObserver());
 	refresh(locations);
-	new Thread() { // refresh list every minute.
-	    public void run() {
-		while (running) {
-		    try {
-			Thread.sleep(60000);
-		    } catch (Exception e) {
-		    }
-		    h.sendEmptyMessage(0);
-		}
-	    }
-	}.start();
     }
 
     // ----------------------------------------------------------
@@ -69,8 +61,9 @@ public class VT_Dining extends Activity {
      * @param v
      */
     public void refresh(View v) {
+	loading();
 	date.refresh();
-	load();
+	date.load();
     }
 
     /**
@@ -81,34 +74,26 @@ public class VT_Dining extends Activity {
      */
     public void pickDate(View v) {
 	showDialog(0);
-
     }
+
     /**
      * Refresh the GUI and startup a refresh thread
      */
     public void onResume() {
-	setUp();
-	running=true;
-	new Thread() { // refresh list every minute.
-	    public void run() {
-		while (running) {
-		    try {
-			Thread.sleep(60000);
-		    } catch (Exception e) {
-		    }
-		    h.sendEmptyMessage(0);
-		}
-	    }
-	}.start();
+	loading();
+	date.load();
+	date.startUp();
 	super.onResume();
     }
+
     /**
      * Kill the update thread
      */
     public void onPause() {
-	running=false; //don't run thread in background.
+	date.stop();
 	super.onPause();
     }
+
     /**
      * Open up a date picker
      */
@@ -171,27 +156,11 @@ public class VT_Dining extends Activity {
     }
 
     /**
-     * Loads data in new thread, then calls helper method which calls setup from
-     * activity thread.
+     * Changes dateDisplay text to "loading"
      */
-    public void load() {
-	if (date.requiresLoading()) {
-	    locations.removeAllViews();
-	    dateDisplay.setText("Loading...");
-	}
-	new Thread() {
-	    public void run() {
-		try {
-		    date.load();
-		    h.sendEmptyMessage(0);
-		} catch (Exception e) {
-		    Message m = new Message();
-		    m.obj = e;
-		    m.what = 1;
-		    h.sendMessage(m);
-		}
-	    }
-	}.start();
+    public void loading() {
+	if(date.requiresLoading())
+	dateDisplay.setText("Loading...");
     }
 
     /**
@@ -250,8 +219,8 @@ public class VT_Dining extends Activity {
      *            unused, can be null
      */
     public void incDay(View v) {
+	loading();
 	date.incDay();
-	load();
     }
 
     /**
@@ -261,9 +230,10 @@ public class VT_Dining extends Activity {
      *            unused, can be null
      */
     public void decDay(View v) {
+	loading();
 	date.decDay();
-	load();
     }
+
     /**
      * Return resource ID based on the state of the location.
      */
@@ -278,6 +248,13 @@ public class VT_Dining extends Activity {
 		return R.drawable.dark;
 	    else
 		return R.drawable.red;
+	}
+    }
+
+    private class DaysObserver implements Observer {
+
+	public void update(Observable unused, Object o) {
+	    h.sendEmptyMessage(0);
 	}
     }
 }
