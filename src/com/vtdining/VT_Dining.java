@@ -44,7 +44,6 @@ public class VT_Dining extends Activity {
 		setUp();
 	    }
 	};
-
 	date.setNow();
 	dateDisplay = (TextView) findViewById(R.id.date);
 	locations = (LinearLayout) findViewById(R.id.locations);
